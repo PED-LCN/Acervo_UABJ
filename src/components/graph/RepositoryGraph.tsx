@@ -28,8 +28,8 @@ export const RepositoryGraph = () => {
 
     const isSelectedContentNode = Boolean(
       selectedPath &&
-        repository.nodesByPath[selectedPath] &&
-        isContentNode(repository.nodesByPath[selectedPath]),
+      repository.nodesByPath[selectedPath] &&
+      isContentNode(repository.nodesByPath[selectedPath]),
     );
     const focusPath = isSelectedContentNode && selectedPath ? selectedPath : "";
     const focusNode = repository.nodesByPath[focusPath];

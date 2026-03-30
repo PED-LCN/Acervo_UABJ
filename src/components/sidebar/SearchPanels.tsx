@@ -22,9 +22,12 @@ const SearchPanelItem = ({ panel }: SearchPanelItemProps) => {
     if (!repository) {
       return [];
     }
-    return searchRepository(repository, panel.query, panel.filters, panel.scopePath).filter(
-      (result) => result.node.type === "dir",
-    );
+    return searchRepository(
+      repository,
+      panel.query,
+      panel.filters,
+      panel.scopePath,
+    ).filter((result) => result.node.type === "dir");
   }, [panel.filters, panel.query, panel.scopePath, repository]);
 
   return (

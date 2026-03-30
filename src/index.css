@@ -47,11 +47,25 @@ body {
   min-height: 100vh;
   color: var(--ink);
   background:
-    radial-gradient(circle at 8% 6%, color-mix(in srgb, var(--accent) 18%, transparent) 0, transparent 36%),
-    radial-gradient(circle at 88% 94%, color-mix(in srgb, var(--accent-strong) 12%, transparent) 0, transparent 30%),
-    linear-gradient(180deg, color-mix(in srgb, var(--bg) 88%, white) 0%, var(--bg) 100%);
+    radial-gradient(
+      circle at 8% 6%,
+      color-mix(in srgb, var(--accent) 18%, transparent) 0,
+      transparent 36%
+    ),
+    radial-gradient(
+      circle at 88% 94%,
+      color-mix(in srgb, var(--accent-strong) 12%, transparent) 0,
+      transparent 30%
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--bg) 88%, white) 0%,
+      var(--bg) 100%
+    );
   font-family: "Space Grotesk", sans-serif;
-  transition: background 0.24s ease, color 0.24s ease;
+  transition:
+    background 0.24s ease,
+    color 0.24s ease;
 }
 
 #root {

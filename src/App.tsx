@@ -94,7 +94,11 @@ function App() {
           <p className="eyebrow">Repositorio academico visual</p>
           <h1>UABJ Engenharia Dashboard</h1>
         </div>
-        <div className="theme-toggle" role="group" aria-label="Tema da interface">
+        <div
+          className="theme-toggle"
+          role="group"
+          aria-label="Tema da interface"
+        >
           <button
             className={theme === "light" ? "active" : ""}
             onClick={toggleTheme}
@@ -104,7 +108,9 @@ function App() {
         </div>
       </header>
 
-      <main className={`dashboard-grid ${viewerExpanded ? "viewer-expanded" : ""}`}>
+      <main
+        className={`dashboard-grid ${viewerExpanded ? "viewer-expanded" : ""}`}
+      >
         <aside className="sidebar">
           <SearchPanels />
           <RepositoryBrowser />

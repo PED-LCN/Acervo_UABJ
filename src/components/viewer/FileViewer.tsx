@@ -92,10 +92,11 @@ export const FileViewer = ({ node }: FileViewerProps) => {
     };
   }, [setViewerExpanded, viewerExpanded]);
 
-
   const renderPreview = () => {
     if (!node || node.type !== "file") {
-      return <p className="muted">Selecione um arquivo para visualizar aqui.</p>;
+      return (
+        <p className="muted">Selecione um arquivo para visualizar aqui.</p>
+      );
     }
 
     const ext = extensionLabel(node);
@@ -103,7 +104,9 @@ export const FileViewer = ({ node }: FileViewerProps) => {
     if (ext === "md") {
       return (
         <article className="markdown-body">
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>{textContent}</ReactMarkdown>
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            {textContent}
+          </ReactMarkdown>
         </article>
       );
     }
@@ -121,17 +124,28 @@ export const FileViewer = ({ node }: FileViewerProps) => {
     }
 
     if (imageExtensions.has(ext)) {
-      return <img src={node.rawUrl} alt={node.name} className="preview-image" />;
+      return (
+        <img src={node.rawUrl} alt={node.name} className="preview-image" />
+      );
     }
 
     if (ext === "pdf") {
-      return <iframe title={node.name} src={node.rawUrl} className="preview-iframe" />;
+      return (
+        <iframe
+          title={node.name}
+          src={node.rawUrl}
+          className="preview-iframe"
+        />
+      );
     }
 
     if (officeExtensions.has(ext)) {
       return (
         <div className="office-fallback">
-          <p>Preview nativo para arquivos Office ainda nao esta habilitado no MVP.</p>
+          <p>
+            Preview nativo para arquivos Office ainda nao esta habilitado no
+            MVP.
+          </p>
           <a href={node.downloadUrl} target="_blank" rel="noreferrer">
             Baixar arquivo
           </a>
@@ -160,7 +174,10 @@ export const FileViewer = ({ node }: FileViewerProps) => {
         <div className="section-header">
           <h2>Visualizador</h2>
           {node && node.type === "file" ? (
-            <ViewerActions node={node} onExpand={() => setViewerExpanded(true)} />
+            <ViewerActions
+              node={node}
+              onExpand={() => setViewerExpanded(true)}
+            />
           ) : null}
         </div>
         {node && node.type === "file" && (
@@ -177,10 +194,16 @@ export const FileViewer = ({ node }: FileViewerProps) => {
             className="viewer-modal-overlay"
             onClick={() => setViewerExpanded(false)}
           >
-            <section className="viewer-modal" onClick={(event) => event.stopPropagation()}>
+            <section
+              className="viewer-modal"
+              onClick={(event) => event.stopPropagation()}
+            >
               <header className="viewer-modal-header">
                 <h2>Visualizacao ampliada</h2>
-                <button className="ghost" onClick={() => setViewerExpanded(false)}>
+                <button
+                  className="ghost"
+                  onClick={() => setViewerExpanded(false)}
+                >
                   Fechar
                 </button>
               </header>
