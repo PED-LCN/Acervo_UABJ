@@ -1,9 +1,22 @@
 import type {
   ContentCategory,
+  RepoNode,
   RepositoryIndex,
   SearchFilters,
   SearchResult,
 } from "../types/repository";
+
+const METADATA_EXACT = new Set([
+  "license",
+  "license.md",
+  "readme",
+  "readme.md",
+  "contributing.md",
+  ".gitignore",
+  ".gitattributes",
+]);
+
+const METADATA_PREFIXES = [".github", ".git", "docs"];
 
 const tokenize = (value: string): string[] =>
   value.toLowerCase().trim().split(/\s+/).filter(Boolean);
@@ -43,6 +56,36 @@ export const allCategories: ContentCategory[] = [
   "outros",
 ];
 
+const isMetadataName = (name: string): boolean => {
+  const normalizedName = name.toLowerCase();
+  if (METADATA_EXACT.has(normalizedName)) {
+    return true;
+  }
+  if (normalizedName.startsWith("readme")) {
+    return true;
+  }
+  return false;
+};
+
+export const isContentNode = (node: RepoNode): boolean => {
+  if (node.path === "") {
+    return true;
+  }
+
+  const lowerPath = node.path.toLowerCase();
+  const firstSegment = lowerPath.split("/")[0];
+
+  if (METADATA_PREFIXES.some((prefix) => firstSegment.startsWith(prefix))) {
+    return false;
+  }
+
+  if (isMetadataName(node.name)) {
+    return false;
+  }
+
+  return true;
+};
+
 export const searchRepository = (
   repository: RepositoryIndex,
   query: string,
@@ -62,6 +105,7 @@ export const searchRepository = (
       return path === scopePath || path.startsWith(scopedPrefix);
     })
     .map((path) => repository.nodesByPath[path])
+    .filter((node) => isContentNode(node))
     .filter((node) => filters.types.includes(node.type))
     .filter((node) => {
       if (filters.categories.length === 0) {

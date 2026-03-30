@@ -22,11 +22,8 @@ const SearchPanelItem = ({ panel }: SearchPanelItemProps) => {
     if (!repository) {
       return [];
     }
-    return searchRepository(
-      repository,
-      panel.query,
-      panel.filters,
-      panel.scopePath,
+    return searchRepository(repository, panel.query, panel.filters, panel.scopePath).filter(
+      (result) => result.node.type === "dir",
     );
   }, [panel.filters, panel.query, panel.scopePath, repository]);
 
@@ -84,12 +81,10 @@ const SearchPanelItem = ({ panel }: SearchPanelItemProps) => {
               className="result-link"
               onClick={() => {
                 setSelectedPath(result.path);
-                if (result.node.type === "file") {
-                  openFile(result.path);
-                }
+                openFile(null);
               }}
             >
-              <span>{result.node.type === "dir" ? "DIR" : "FILE"}</span>
+              <span>DIR</span>
               <small>{result.path}</small>
             </button>
           </li>

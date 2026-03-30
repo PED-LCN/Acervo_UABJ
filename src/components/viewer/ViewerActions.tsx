@@ -2,19 +2,26 @@ import type { RepoNode } from "../../types/repository";
 
 interface ViewerActionsProps {
   node: RepoNode;
+  onExpand: () => void;
 }
 
 const copyToClipboard = async (value: string) => {
   await navigator.clipboard.writeText(value);
 };
 
-export const ViewerActions = ({ node }: ViewerActionsProps) => {
+export const ViewerActions = ({ node, onExpand }: ViewerActionsProps) => {
   const deepLink = `${window.location.origin}${window.location.pathname}?path=${encodeURIComponent(
     node.parentPath ?? "",
-  )}&file=${encodeURIComponent(node.path)}&mode=${new URLSearchParams(window.location.search).get("mode") ?? "hierarchy"}`;
+  )}&file=${encodeURIComponent(node.path)}&mode=hierarchy`;
 
   return (
     <div className="viewer-actions">
+      <button className="ghost" onClick={onExpand}>
+        Ampliar
+      </button>
+      <a className="ghost" href={deepLink} target="_blank" rel="noreferrer">
+        Abrir em nova pagina
+      </a>
       <a
         className="ghost"
         href={node.downloadUrl}

@@ -25,16 +25,16 @@ h1 {
   margin-top: 6px;
 }
 
-.mode-toggle {
+.theme-toggle {
   display: flex;
-  background: #d8e8f4;
+  background: color-mix(in srgb, var(--accent) 18%, var(--card));
   padding: 4px;
   border-radius: 12px;
   gap: 4px;
 }
 
-.mode-toggle button {
-  border: 0;
+.theme-toggle button {
+  border: 1px solid transparent;
   background: transparent;
   color: var(--muted);
   border-radius: 8px;
@@ -43,8 +43,9 @@ h1 {
   font-weight: 600;
 }
 
-.mode-toggle button.active {
-  background: #fff;
+.theme-toggle button.active {
+  background: var(--card);
+  border-color: var(--line);
   color: var(--accent-strong);
 }
 
@@ -84,7 +85,7 @@ h1 {
   border: 1px solid var(--line);
   border-radius: 16px;
   overflow: hidden;
-  background: #f5f9fd;
+  background: var(--bg-elevated);
   min-height: calc(100vh - 190px);
 }
 
@@ -103,8 +104,8 @@ h2 {
 .result-link,
 .browser-item,
 .breadcrumbs button {
-  border: 1px solid #bad1e2;
-  background: #f6fbff;
+  border: 1px solid var(--ghost-border);
+  background: var(--ghost-bg);
   color: var(--ink);
   border-radius: 10px;
   padding: 7px 10px;
@@ -120,21 +121,22 @@ h2 {
 }
 
 .danger {
-  border-color: #ddafbc;
+  border-color: color-mix(in srgb, var(--danger) 55%, var(--line));
   color: var(--danger);
 }
 
 input,
 select {
   width: 100%;
-  border: 1px solid #c8d7e6;
+  border: 1px solid var(--line);
   border-radius: 10px;
   padding: 8px 10px;
-  background: #fff;
+  background: var(--input-bg);
+  color: var(--ink);
 }
 
 .search-panel {
-  border: 1px solid #d3e2ef;
+  border: 1px solid var(--line);
   border-radius: 12px;
   padding: 10px;
   display: grid;
@@ -189,7 +191,7 @@ select {
 
 .browser-item.active {
   border-color: var(--accent);
-  background: #e4f5ff;
+  background: color-mix(in srgb, var(--accent) 20%, var(--ghost-bg));
 }
 
 .breadcrumbs {
@@ -214,7 +216,7 @@ select {
 .viewer-content {
   border: 1px solid var(--line);
   border-radius: 12px;
-  background: #fff;
+  background: var(--input-bg);
   overflow: auto;
   height: 100%;
   padding: 10px;
@@ -258,17 +260,56 @@ select {
 
 .state-pill {
   display: inline-flex;
-  border: 1px solid #bfd4e6;
-  background: #f5fbff;
+  border: 1px solid var(--pill-border);
+  background: var(--pill-bg);
   border-radius: 999px;
   padding: 7px 12px;
   margin-bottom: 8px;
 }
 
 .state-pill.error {
-  border-color: #e6c3ca;
-  background: #fff4f6;
-  color: #9d3548;
+  border-color: color-mix(in srgb, var(--danger) 50%, var(--line));
+  background: color-mix(in srgb, var(--danger) 18%, var(--card));
+  color: var(--danger);
+}
+
+.viewer-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: var(--overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+}
+
+.viewer-modal {
+  width: min(1200px, 100%);
+  height: min(88vh, 940px);
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  gap: 10px;
+  padding: 14px;
+}
+
+.viewer-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.viewer-modal-content {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--input-bg);
+  overflow: auto;
+  padding: 10px;
 }
 
 @media (max-width: 1280px) {

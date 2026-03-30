@@ -16,12 +16,11 @@ const DEFAULT_MODE: GraphMode = "hierarchy";
 
 export const parseDeepLinkState = (search: string): DeepLinkState => {
   const params = new URLSearchParams(search);
-  const mode = params.get("mode");
 
   return {
     path: params.get("path"),
     file: params.get("file"),
-    mode: mode === "semantic" ? "semantic" : DEFAULT_MODE,
+    mode: DEFAULT_MODE,
   };
 };
 

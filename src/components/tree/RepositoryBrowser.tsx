@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { useDashboardStore } from "../../state/useDashboardStore";
+import { isContentNode } from "../../services/indexer";
 
 const pathLabel = (path: string): string => {
   if (!path) {
@@ -42,7 +43,9 @@ export const RepositoryBrowser = () => {
   const currentNode = repository.nodesByPath[currentDirPath];
   const children = currentNode.children.map(
     (childPath) => repository.nodesByPath[childPath],
-  );
+  )
+  .filter((node) => node.type === "dir")
+  .filter((node) => isContentNode(node));
   const breadcrumbs = currentDirPath ? currentDirPath.split("/") : [];
 
   return (

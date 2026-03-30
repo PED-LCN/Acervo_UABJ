@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
@@ -6,6 +7,7 @@ import { oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { fetchTextFile } from "../../services/githubClient";
 import type { RepoNode } from "../../types/repository";
 import { ViewerActions } from "./ViewerActions";
+import { useDashboardStore } from "../../state/useDashboardStore";
 
 interface FileViewerProps {
   node: RepoNode | null;
@@ -40,6 +42,7 @@ const extensionLabel = (node: RepoNode | null) =>
 
 export const FileViewer = ({ node }: FileViewerProps) => {
   const [textContent, setTextContent] = useState<string>("");
+  const { viewerExpanded, setViewerExpanded } = useDashboardStore();
 
   useEffect(() => {
     if (!node || node.type !== "file") {
@@ -72,11 +75,27 @@ export const FileViewer = ({ node }: FileViewerProps) => {
     };
   }, [node]);
 
-  const content = useMemo(() => {
+  useEffect(() => {
+    if (!viewerExpanded) {
+      return;
+    }
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setViewerExpanded(false);
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [setViewerExpanded, viewerExpanded]);
+
+
+  const renderPreview = () => {
     if (!node || node.type !== "file") {
-      return (
-        <p className="muted">Selecione um arquivo para visualizar aqui.</p>
-      );
+      return <p className="muted">Selecione um arquivo para visualizar aqui.</p>;
     }
 
     const ext = extensionLabel(node);
@@ -84,9 +103,7 @@ export const FileViewer = ({ node }: FileViewerProps) => {
     if (ext === "md") {
       return (
         <article className="markdown-body">
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>
-            {textContent}
-          </ReactMarkdown>
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>{textContent}</ReactMarkdown>
         </article>
       );
     }
@@ -104,28 +121,17 @@ export const FileViewer = ({ node }: FileViewerProps) => {
     }
 
     if (imageExtensions.has(ext)) {
-      return (
-        <img src={node.rawUrl} alt={node.name} className="preview-image" />
-      );
+      return <img src={node.rawUrl} alt={node.name} className="preview-image" />;
     }
 
     if (ext === "pdf") {
-      return (
-        <iframe
-          title={node.name}
-          src={node.rawUrl}
-          className="preview-iframe"
-        />
-      );
+      return <iframe title={node.name} src={node.rawUrl} className="preview-iframe" />;
     }
 
     if (officeExtensions.has(ext)) {
       return (
         <div className="office-fallback">
-          <p>
-            Preview nativo para arquivos Office ainda nao esta habilitado no
-            MVP.
-          </p>
+          <p>Preview nativo para arquivos Office ainda nao esta habilitado no MVP.</p>
           <a href={node.downloadUrl} target="_blank" rel="noreferrer">
             Baixar arquivo
           </a>
@@ -144,18 +150,46 @@ export const FileViewer = ({ node }: FileViewerProps) => {
         </a>
       </div>
     );
-  }, [node, textContent]);
+  };
+
+  const content = renderPreview();
 
   return (
-    <div className="card viewer-card stack-gap">
-      <div className="section-header">
-        <h2>Visualizador</h2>
-        {node && node.type === "file" ? <ViewerActions node={node} /> : null}
+    <>
+      <div className="card viewer-card stack-gap">
+        <div className="section-header">
+          <h2>Visualizador</h2>
+          {node && node.type === "file" ? (
+            <ViewerActions node={node} onExpand={() => setViewerExpanded(true)} />
+          ) : null}
+        </div>
+        {node && node.type === "file" && (
+          <p className="viewer-path">{node.path}</p>
+        )}
+        <div className="viewer-content">{content}</div>
       </div>
-      {node && node.type === "file" && (
-        <p className="viewer-path">{node.path}</p>
-      )}
-      <div className="viewer-content">{content}</div>
-    </div>
+
+      {viewerExpanded &&
+        node &&
+        node.type === "file" &&
+        createPortal(
+          <div
+            className="viewer-modal-overlay"
+            onClick={() => setViewerExpanded(false)}
+          >
+            <section className="viewer-modal" onClick={(event) => event.stopPropagation()}>
+              <header className="viewer-modal-header">
+                <h2>Visualizacao ampliada</h2>
+                <button className="ghost" onClick={() => setViewerExpanded(false)}>
+                  Fechar
+                </button>
+              </header>
+              <p className="viewer-path">{node.path}</p>
+              <div className="viewer-modal-content">{content}</div>
+            </section>
+          </div>,
+          document.body,
+        )}
+    </>
   );
 };

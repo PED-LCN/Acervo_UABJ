@@ -15,20 +15,18 @@ function App() {
     error,
     selectedPath,
     openedFilePath,
-    graphMode,
+    theme,
+    viewerExpanded,
     setRepository,
     setLoading,
     setError,
-    setGraphMode,
+    toggleTheme,
     setSelectedPath,
     openFile,
   } = useDashboardStore();
 
   useEffect(() => {
     const initial = parseDeepLinkState(window.location.search);
-    if (initial.mode) {
-      setGraphMode(initial.mode);
-    }
     if (initial.path) {
       setSelectedPath(initial.path);
       openFile(initial.file ?? null);
@@ -36,7 +34,11 @@ function App() {
       setSelectedPath(initial.file);
       openFile(initial.file);
     }
-  }, [openFile, setGraphMode, setSelectedPath]);
+  }, [openFile, setSelectedPath]);
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+  }, [theme]);
 
   useEffect(() => {
     let cancelled = false;
@@ -76,9 +78,9 @@ function App() {
     writeDeepLinkState({
       path: selectedPath,
       file: openedFilePath,
-      mode: graphMode,
+      mode: "hierarchy",
     });
-  }, [graphMode, openedFilePath, selectedPath]);
+  }, [openedFilePath, selectedPath]);
 
   const openedNode =
     openedFilePath && repository
@@ -92,23 +94,17 @@ function App() {
           <p className="eyebrow">Repositorio academico visual</p>
           <h1>UABJ Engenharia Dashboard</h1>
         </div>
-        <div className="mode-toggle" role="group" aria-label="Modo do grafo">
+        <div className="theme-toggle" role="group" aria-label="Tema da interface">
           <button
-            className={graphMode === "hierarchy" ? "active" : ""}
-            onClick={() => setGraphMode("hierarchy")}
+            className={theme === "light" ? "active" : ""}
+            onClick={toggleTheme}
           >
-            Hierarquia
-          </button>
-          <button
-            className={graphMode === "semantic" ? "active" : ""}
-            onClick={() => setGraphMode("semantic")}
-          >
-            Semantico
+            {theme === "light" ? "Ativar modo escuro" : "Ativar modo claro"}
           </button>
         </div>
       </header>
 
-      <main className="dashboard-grid">
+      <main className={`dashboard-grid ${viewerExpanded ? "viewer-expanded" : ""}`}>
         <aside className="sidebar">
           <SearchPanels />
           <RepositoryBrowser />

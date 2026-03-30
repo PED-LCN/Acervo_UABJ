@@ -2,6 +2,7 @@
 
 :root {
   --bg: #edf4fb;
+  --bg-elevated: #f5f9fd;
   --ink: #112133;
   --muted: #4d5f73;
   --card: #ffffff;
@@ -9,7 +10,32 @@
   --accent: #0c7fb0;
   --accent-strong: #0b5d87;
   --danger: #9d3548;
+  --ghost-bg: #f6fbff;
+  --ghost-border: #bad1e2;
+  --input-bg: #ffffff;
+  --pill-bg: #f5fbff;
+  --pill-border: #bfd4e6;
+  --overlay: rgba(12, 26, 42, 0.68);
   --shadow: 0 14px 42px rgba(11, 53, 78, 0.12);
+}
+
+:root[data-theme="dark"] {
+  --bg: #0f1724;
+  --bg-elevated: #131f31;
+  --ink: #e7f0fb;
+  --muted: #9fb2ca;
+  --card: #162438;
+  --line: #2a3d58;
+  --accent: #52bfdc;
+  --accent-strong: #9de4f8;
+  --danger: #f2959d;
+  --ghost-bg: #1c2d45;
+  --ghost-border: #355071;
+  --input-bg: #122033;
+  --pill-bg: #1a2a40;
+  --pill-border: #2d4667;
+  --overlay: rgba(6, 10, 18, 0.76);
+  --shadow: 0 18px 44px rgba(0, 0, 0, 0.36);
 }
 
 * {
@@ -21,10 +47,11 @@ body {
   min-height: 100vh;
   color: var(--ink);
   background:
-    radial-gradient(circle at 8% 6%, #dbebf7 0, transparent 36%),
-    radial-gradient(circle at 88% 94%, #d3e5f3 0, transparent 30%),
-    linear-gradient(180deg, #f3f8fd 0%, #e9f1f9 100%);
+    radial-gradient(circle at 8% 6%, color-mix(in srgb, var(--accent) 18%, transparent) 0, transparent 36%),
+    radial-gradient(circle at 88% 94%, color-mix(in srgb, var(--accent-strong) 12%, transparent) 0, transparent 30%),
+    linear-gradient(180deg, color-mix(in srgb, var(--bg) 88%, white) 0%, var(--bg) 100%);
   font-family: "Space Grotesk", sans-serif;
+  transition: background 0.24s ease, color 0.24s ease;
 }
 
 #root {

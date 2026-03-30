@@ -1,6 +1,8 @@
 export type NodeType = "file" | "dir";
 
-export type GraphMode = "hierarchy" | "semantic";
+export type GraphMode = "hierarchy";
+
+export type ThemeMode = "light" | "dark";
 
 export type ContentCategory =
   | "resumos"
