@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { ContributionGuide } from "./components/contribute/ContributionGuide";
+import { SchedulePlanner } from "./components/planner/SchedulePlanner";
 import { SearchPanels } from "./components/sidebar/SearchPanels";
 import { RepositoryBrowser } from "./components/tree/RepositoryBrowser";
 import { FileViewer } from "./components/viewer/FileViewer";
@@ -10,6 +11,7 @@ import "./App.css";
 
 function App() {
   const [contributionOpen, setContributionOpen] = useState(false);
+  const [activeView, setActiveView] = useState<"library" | "planner">("library");
   const { repository, loading, error, selectedPath, openedFilePath, theme, setRepository, setLoading, setError, toggleTheme, setSelectedPath, openFile } = useDashboardStore();
 
   useEffect(() => {
@@ -52,14 +54,17 @@ function App() {
           </span>
           <span><strong>Acervo UABJ</strong><small>Engenharia da Computação</small></span>
         </a>
-        <SearchPanels />
+        {activeView === "library" ? <SearchPanels /> : <nav className="section-switcher" aria-label="Áreas do site"><button onClick={() => setActiveView("library")}>Acervo</button><button className="active" aria-current="page">Planejador</button></nav>}
         <div className="header-actions">
+          {activeView === "library" && <button className="planner-button" onClick={() => setActiveView("planner")}>Montar grade</button>}
           <button className="contribute-button" onClick={() => setContributionOpen(true)}>Como contribuir</button>
           <button className="theme-button" onClick={toggleTheme} aria-label={`Ativar tema ${theme === "light" ? "escuro" : "claro"}`}>{theme === "light" ? "☾" : "☀"}</button>
         </div>
       </header>
 
-      <main className="main-content">
+      <main className={`main-content ${activeView === "planner" ? "planner-main" : ""}`}>
+        {activeView === "planner" && <SchedulePlanner />}
+        {activeView === "library" && <>
         {loading && <section className="loading-state"><div className="loader" /><h1>Organizando o acervo...</h1><p>Estamos preparando os materiais para você.</p></section>}
         {error && <section className="error-state"><span>⚠</span><h1>Não foi possível abrir o acervo</h1><p>{error}</p><button onClick={() => window.location.reload()}>Tentar novamente</button></section>}
         {!loading && !error && repository && (
@@ -68,9 +73,10 @@ function App() {
             <RepositoryBrowser />
           </>
         )}
+        </>}
       </main>
 
-      {openedNode && <aside className="viewer-drawer" aria-label="Visualizador de material"><FileViewer node={openedNode} /></aside>}
+      {activeView === "library" && openedNode && <aside className="viewer-drawer" aria-label="Visualizador de material"><FileViewer node={openedNode} /></aside>}
       {contributionOpen && <ContributionGuide onClose={() => setContributionOpen(false)} />}
       <footer><span>Acervo comunitário da UABJ</span><a href="https://github.com/FelipePatriota/uabj-engenharia-computacao" target="_blank" rel="noreferrer">Acessar repositório ↗</a></footer>
     </div>

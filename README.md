@@ -10,9 +10,15 @@ A aplicação transforma a estrutura técnica do GitHub em uma navegação amig�
 - PDFs, Markdown, imagens e código podem ser conferidos na plataforma;
 - cada material continua disponível para download e consulta no GitHub;
 - links diretos preservam a seção e o material selecionados.
+- planejador de grade com catálogo do PPC, pré-requisitos e conflitos de horário;
+- progresso e simulações salvos somente no navegador, com backup em JSON.
 
 O conteúdo vem de
 [`FelipePatriota/uabj-engenharia-computacao`](https://github.com/FelipePatriota/uabj-engenharia-computacao).
+
+O catálogo inicial do planejador foi transcrito do PPC de Engenharia de
+Computação de 2020. Ele é uma referência de apoio e não substitui a oferta ou
+as regras publicadas nos sistemas oficiais da universidade.
 
 ## Stack
 
