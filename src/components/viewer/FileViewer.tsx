@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -38,6 +38,10 @@ const codeExtensions = new Set([
 const extensionLabel = (node: RepoNode | null) =>
   node?.extension?.toLowerCase() ?? "";
 
+const PdfViewer = lazy(() =>
+  import("./PdfViewer").then((module) => ({ default: module.PdfViewer })),
+);
+
 export const FileViewer = ({ node }: FileViewerProps) => {
   const [textPreview, setTextPreview] = useState<{
     path: string;
@@ -46,6 +50,14 @@ export const FileViewer = ({ node }: FileViewerProps) => {
   }>({ path: "", content: "", error: false });
   const { viewerExpanded, setViewerExpanded } = useDashboardStore();
   const { openFile } = useDashboardStore();
+
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, []);
 
   useEffect(() => {
     if (!node || node.type !== "file") {
@@ -137,11 +149,9 @@ export const FileViewer = ({ node }: FileViewerProps) => {
 
     if (ext === "pdf") {
       return (
-        <iframe
-          title={node.name}
-          src={node.rawUrl}
-          className="preview-iframe"
-        />
+        <Suspense fallback={<p className="preview-message">Preparando o leitor de PDF...</p>}>
+          <PdfViewer key={node.path} name={node.name} url={node.rawUrl} />
+        </Suspense>
       );
     }
 

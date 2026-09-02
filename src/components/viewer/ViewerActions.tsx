@@ -23,12 +23,15 @@ export const ViewerActions = ({ node, onExpand }: ViewerActionsProps) => {
         Abrir em nova pagina
       </a>
       <a
-        className="ghost"
+        className="ghost download-action"
         href={node.downloadUrl}
-        target="_blank"
-        rel="noreferrer"
+        download={node.name}
+        aria-label={`Baixar ${node.name}`}
       >
-        Download
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 3v11m0 0 4-4m-4 4-4-4M5 16v3h14v-3" />
+        </svg>
+        Baixar
       </a>
       <button className="ghost" onClick={() => copyToClipboard(node.htmlUrl)}>
         Copiar link GitHub
