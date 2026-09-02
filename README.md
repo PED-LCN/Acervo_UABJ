@@ -12,7 +12,7 @@ A aplicação transforma a estrutura técnica do GitHub em uma navegação amig�
 - links diretos preservam a seção e o material selecionados.
 
 O conteúdo vem de
-[`LipeLacross/uabj-engenharia-computacao`](https://github.com/LipeLacross/uabj-engenharia-computacao).
+[`FelipePatriota/uabj-engenharia-computacao`](https://github.com/FelipePatriota/uabj-engenharia-computacao).
 
 ## Stack
 
@@ -26,7 +26,7 @@ O conteúdo vem de
 Copie `.env.example` para `.env` quando quiser alterar a fonte do acervo:
 
 ```env
-VITE_GITHUB_OWNER=LipeLacross
+VITE_GITHUB_OWNER=FelipePatriota
 VITE_GITHUB_REPO=uabj-engenharia-computacao
 VITE_GITHUB_BRANCH=main
 VITE_BASE_PATH=/Panel_UA/

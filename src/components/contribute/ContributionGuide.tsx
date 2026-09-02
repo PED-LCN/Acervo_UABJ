@@ -6,7 +6,7 @@ interface ContributionGuideProps {
 }
 
 const repositoryUrl =
-  "https://github.com/LipeLacross/uabj-engenharia-computacao";
+  "https://github.com/FelipePatriota/uabj-engenharia-computacao";
 
 const steps = [
   {

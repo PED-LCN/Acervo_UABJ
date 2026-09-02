@@ -43,7 +43,13 @@ function App() {
     <div className="app-shell">
       <header className="site-header">
         <a className="brand" href={import.meta.env.BASE_URL} aria-label="Voltar ao início">
-          <span className="brand-mark" aria-hidden="true">UA</span>
+          <span className="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 32 32" focusable="false">
+              <rect x="8" y="8" width="16" height="16" rx="3" />
+              <rect className="chip-core" x="12" y="12" width="8" height="8" rx="1" />
+              <path d="M11 4v4m5-4v4m5-4v4M11 24v4m5-4v4m5-4v4M4 11h4m-4 5h4m-4 5h4m16-10h4m-4 5h4m-4 5h4" />
+            </svg>
+          </span>
           <span><strong>Acervo UABJ</strong><small>Engenharia da Computação</small></span>
         </a>
         <SearchPanels />
@@ -66,7 +72,7 @@ function App() {
 
       {openedNode && <aside className="viewer-drawer" aria-label="Visualizador de material"><FileViewer node={openedNode} /></aside>}
       {contributionOpen && <ContributionGuide onClose={() => setContributionOpen(false)} />}
-      <footer><span>Acervo comunitário da UABJ</span><a href="https://github.com/LipeLacross/uabj-engenharia-computacao" target="_blank" rel="noreferrer">Acessar repositório ↗</a></footer>
+      <footer><span>Acervo comunitário da UABJ</span><a href="https://github.com/FelipePatriota/uabj-engenharia-computacao" target="_blank" rel="noreferrer">Acessar repositório ↗</a></footer>
     </div>
   );
 }
