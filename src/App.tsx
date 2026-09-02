@@ -1,4 +1,5 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { ContributionGuide } from "./components/contribute/ContributionGuide";
 import { SearchPanels } from "./components/sidebar/SearchPanels";
 import { RepositoryBrowser } from "./components/tree/RepositoryBrowser";
 import { FileViewer } from "./components/viewer/FileViewer";
@@ -8,6 +9,7 @@ import { parseDeepLinkState, writeDeepLinkState } from "./utils/deepLink";
 import "./App.css";
 
 function App() {
+  const [contributionOpen, setContributionOpen] = useState(false);
   const { repository, loading, error, selectedPath, openedFilePath, theme, setRepository, setLoading, setError, toggleTheme, setSelectedPath, openFile } = useDashboardStore();
 
   useEffect(() => {
@@ -46,7 +48,7 @@ function App() {
         </a>
         <SearchPanels />
         <div className="header-actions">
-          <a href="https://github.com/LipeLacross/uabj-engenharia-computacao" target="_blank" rel="noreferrer">Contribuir</a>
+          <button className="contribute-button" onClick={() => setContributionOpen(true)}>Como contribuir</button>
           <button className="theme-button" onClick={toggleTheme} aria-label={`Ativar tema ${theme === "light" ? "escuro" : "claro"}`}>{theme === "light" ? "☾" : "☀"}</button>
         </div>
       </header>
@@ -63,6 +65,7 @@ function App() {
       </main>
 
       {openedNode && <aside className="viewer-drawer" aria-label="Visualizador de material"><FileViewer node={openedNode} /></aside>}
+      {contributionOpen && <ContributionGuide onClose={() => setContributionOpen(false)} />}
       <footer><span>Acervo comunitário da UABJ</span><a href="https://github.com/LipeLacross/uabj-engenharia-computacao" target="_blank" rel="noreferrer">Acessar repositório ↗</a></footer>
     </div>
   );
