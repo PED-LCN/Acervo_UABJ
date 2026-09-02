@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { ContributionGuide } from "./components/contribute/ContributionGuide";
+import { CommunityFooter } from "./components/footer/CommunityFooter";
 import { SchedulePlanner } from "./components/planner/SchedulePlanner";
 import { SearchPanels } from "./components/sidebar/SearchPanels";
 import { RepositoryBrowser } from "./components/tree/RepositoryBrowser";
@@ -69,7 +70,17 @@ function App() {
         {error && <section className="error-state"><span>⚠</span><h1>Não foi possível abrir o acervo</h1><p>{error}</p><button onClick={() => window.location.reload()}>Tentar novamente</button></section>}
         {!loading && !error && repository && (
           <>
-            {!selectedPath && <section className="welcome"><div><p className="eyebrow">Materiais feitos por alunos, para alunos</p><h1>Encontre o que precisa para continuar aprendendo.</h1><p>Navegue por períodos e disciplinas ou pesquise diretamente por uma prova, lista ou assunto.</p></div><div className="collection-stats"><span><strong>{repository.dirPaths.length}</strong> seções</span><span><strong>{repository.filePaths.length}</strong> materiais</span></div></section>}
+            {!selectedPath && <>
+              <section className="welcome"><div><p className="eyebrow">Materiais feitos por alunos, para alunos</p><h1>Encontre o que precisa para continuar aprendendo.</h1><p>Navegue por períodos e disciplinas ou pesquise diretamente por uma prova, lista ou assunto.</p></div><div className="collection-stats"><span><strong>{repository.dirPaths.length}</strong> seções</span><span><strong>{repository.filePaths.length}</strong> materiais</span></div></section>
+              <section className="project-summary" aria-labelledby="project-summary-title">
+                <div>
+                  <p className="eyebrow">Sobre o projeto</p>
+                  <h2 id="project-summary-title">Uma memória coletiva do curso, mais simples de consultar.</h2>
+                </div>
+                <p>O Acervo UABJ transforma o repositório colaborativo de Engenharia da Computação em uma plataforma amigável para calouros, veteranos e futuras turmas. Aqui você encontra resumos, listas, provas, projetos, guias e dicas organizados por período e disciplina, pode visualizar os arquivos antes de baixar e usar o planejador como apoio no início do semestre.</p>
+                <div className="summary-points" aria-label="Principais características"><span>Organizado por período</span><span>Visualização rápida</span><span>Construído pela comunidade</span></div>
+              </section>
+            </>}
             <RepositoryBrowser />
           </>
         )}
@@ -78,7 +89,7 @@ function App() {
 
       {activeView === "library" && openedNode && <aside className="viewer-drawer" aria-label="Visualizador de material"><FileViewer node={openedNode} /></aside>}
       {contributionOpen && <ContributionGuide onClose={() => setContributionOpen(false)} />}
-      <footer><span>Acervo comunitário da UABJ</span><a href="https://github.com/FelipePatriota/uabj-engenharia-computacao" target="_blank" rel="noreferrer">Acessar repositório ↗</a></footer>
+      <CommunityFooter onContribute={() => setContributionOpen(true)} />
     </div>
   );
 }

@@ -35,7 +35,7 @@ Copie `.env.example` para `.env` quando quiser alterar a fonte do acervo:
 VITE_GITHUB_OWNER=FelipePatriota
 VITE_GITHUB_REPO=uabj-engenharia-computacao
 VITE_GITHUB_BRANCH=main
-VITE_BASE_PATH=/Panel_UA/
+VITE_BASE_PATH=/Acervo_UABJ/
 ```
 
 Tokens não são aceitos no frontend: variáveis `VITE_*` são públicas no

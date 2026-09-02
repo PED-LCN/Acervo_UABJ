@@ -18,6 +18,7 @@ interface PdfViewerProps {
 
 export const PdfViewer = ({ name, url }: PdfViewerProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const [document, setDocument] = useState<PDFDocumentProxy | null>(null);
   const [page, setPage] = useState(1);
   const [zoom, setZoom] = useState(1);
@@ -77,6 +78,21 @@ export const PdfViewer = ({ name, url }: PdfViewerProps) => {
     };
   }, [document, page, zoom]);
 
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ top: 0, left: 0 });
+  }, [page]);
+
+  const pan = (horizontal: number, vertical: number) => {
+    const container = scrollRef.current;
+    if (!container) return;
+    container.scrollBy({
+      left: horizontal * Math.max(140, container.clientWidth * 0.55),
+      top: vertical * Math.max(140, container.clientHeight * 0.55),
+      behavior: "smooth",
+    });
+    container.focus({ preventScroll: true });
+  };
+
   if (error) {
     return (
       <div className="pdf-state" role="alert">
@@ -112,6 +128,13 @@ export const PdfViewer = ({ name, url }: PdfViewerProps) => {
             →
           </button>
         </div>
+        <div className="pdf-pan" aria-label="Mover página">
+          <button className="pan-up" onClick={() => pan(0, -1)} aria-label="Mover para cima">↑</button>
+          <button className="pan-left" onClick={() => pan(-1, 0)} aria-label="Mover para a esquerda">←</button>
+          <span aria-hidden="true">●</span>
+          <button className="pan-right" onClick={() => pan(1, 0)} aria-label="Mover para a direita">→</button>
+          <button className="pan-down" onClick={() => pan(0, 1)} aria-label="Mover para baixo">↓</button>
+        </div>
         <div className="pdf-zoom">
           <button
             onClick={() => setZoom((current) => Math.max(0.65, current - 0.15))}
@@ -128,7 +151,24 @@ export const PdfViewer = ({ name, url }: PdfViewerProps) => {
           </button>
         </div>
       </div>
-      <div className="pdf-canvas-wrap">
+      <div
+        className="pdf-canvas-wrap"
+        ref={scrollRef}
+        tabIndex={0}
+        aria-label="Área navegável do PDF. Use as setas do teclado ou os controles direcionais."
+        onKeyDown={(event) => {
+          const directions: Record<string, [number, number]> = {
+            ArrowUp: [0, -1],
+            ArrowDown: [0, 1],
+            ArrowLeft: [-1, 0],
+            ArrowRight: [1, 0],
+          };
+          const direction = directions[event.key];
+          if (!direction) return;
+          event.preventDefault();
+          pan(...direction);
+        }}
+      >
         {!document && <div className="pdf-loading"><span />Preparando {name}...</div>}
         <canvas ref={canvasRef} aria-label={`Prévia de ${name}, página ${page}`} />
       </div>
