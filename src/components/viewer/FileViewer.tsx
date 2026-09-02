@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { fetchTextFile } from "../../services/githubClient";
 import type { RepoNode } from "../../types/repository";
 import { ViewerActions } from "./ViewerActions";
@@ -41,8 +39,13 @@ const extensionLabel = (node: RepoNode | null) =>
   node?.extension?.toLowerCase() ?? "";
 
 export const FileViewer = ({ node }: FileViewerProps) => {
-  const [textContent, setTextContent] = useState<string>("");
+  const [textPreview, setTextPreview] = useState<{
+    path: string;
+    content: string;
+    error: boolean;
+  }>({ path: "", content: "", error: false });
   const { viewerExpanded, setViewerExpanded } = useDashboardStore();
+  const { openFile } = useDashboardStore();
 
   useEffect(() => {
     if (!node || node.type !== "file") {
@@ -60,15 +63,14 @@ export const FileViewer = ({ node }: FileViewerProps) => {
     fetchTextFile(node.rawUrl)
       .then((content) => {
         if (!cancelled) {
-          setTextContent(content);
+          setTextPreview({ path: node.path, content, error: false });
         }
       })
       .catch(() => {
         if (!cancelled) {
-          setTextContent("");
+          setTextPreview({ path: node.path, content: "", error: true });
         }
-      })
-      .finally(() => undefined);
+      });
 
     return () => {
       cancelled = true;
@@ -100,11 +102,21 @@ export const FileViewer = ({ node }: FileViewerProps) => {
     }
 
     const ext = extensionLabel(node);
+    const isTextPreview = ext === "md" || codeExtensions.has(ext);
+    const textLoading = isTextPreview && textPreview.path !== node.path;
+    const textError = isTextPreview && textPreview.path === node.path && textPreview.error;
+    const textContent = textPreview.path === node.path ? textPreview.content : "";
+
+    if (textLoading) return <p className="preview-message">Carregando conteúdo...</p>;
+    if (textError) return <p className="preview-message">Não foi possível carregar a prévia deste arquivo.</p>;
 
     if (ext === "md") {
       return (
         <article className="markdown-body">
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            urlTransform={(url) => new URL(url, node.rawUrl).toString()}
+          >
             {textContent}
           </ReactMarkdown>
         </article>
@@ -113,13 +125,7 @@ export const FileViewer = ({ node }: FileViewerProps) => {
 
     if (codeExtensions.has(ext)) {
       return (
-        <SyntaxHighlighter
-          language={ext}
-          style={oneLight}
-          customStyle={{ margin: 0 }}
-        >
-          {textContent}
-        </SyntaxHighlighter>
+        <pre className="code-preview"><code>{textContent}</code></pre>
       );
     }
 
@@ -172,7 +178,10 @@ export const FileViewer = ({ node }: FileViewerProps) => {
     <>
       <div className="card viewer-card stack-gap">
         <div className="section-header">
-          <h2>Visualizador</h2>
+          <div><p className="eyebrow">Visualizando</p><h2>{node?.name ?? "Material"}</h2></div>
+          <button className="close-viewer" onClick={() => openFile(null)} aria-label="Fechar visualizador">×</button>
+        </div>
+        <div className="viewer-toolbar">
           {node && node.type === "file" ? (
             <ViewerActions
               node={node}

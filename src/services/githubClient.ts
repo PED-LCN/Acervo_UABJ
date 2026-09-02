@@ -2,7 +2,6 @@ import {
   GITHUB_BRANCH,
   GITHUB_OWNER,
   GITHUB_REPO,
-  GITHUB_TOKEN,
 } from "../config/github";
 import type {
   ContentCategory,
@@ -193,15 +192,9 @@ const indexTreeItems = (treeItems: GitTreeItem[]): RepositoryIndex => {
 };
 
 export const fetchRepositoryIndex = async (): Promise<RepositoryIndex> => {
-  let requestHeaders: HeadersInit = {
+  const requestHeaders: HeadersInit = {
     Accept: "application/vnd.github+json",
   };
-  if (GITHUB_TOKEN) {
-    requestHeaders = {
-      ...requestHeaders,
-      Authorization: `Bearer ${GITHUB_TOKEN}`,
-    };
-  }
 
   const response = await fetch(
     `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/git/trees/${GITHUB_BRANCH}?recursive=1`,
@@ -217,6 +210,11 @@ export const fetchRepositoryIndex = async (): Promise<RepositoryIndex> => {
   }
 
   const payload = (await response.json()) as GitTreeResponse;
+  if (payload.truncated) {
+    throw new Error(
+      "O GitHub devolveu uma arvore incompleta. Tente novamente mais tarde.",
+    );
+  }
   return indexTreeItems(payload.tree);
 };
 

@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { SearchPanels } from "./components/sidebar/SearchPanels";
-import { RepositoryGraph } from "./components/graph/RepositoryGraph";
 import { RepositoryBrowser } from "./components/tree/RepositoryBrowser";
 import { FileViewer } from "./components/viewer/FileViewer";
 import { fetchRepositoryIndex } from "./services/githubClient";
@@ -9,125 +8,62 @@ import { parseDeepLinkState, writeDeepLinkState } from "./utils/deepLink";
 import "./App.css";
 
 function App() {
-  const {
-    repository,
-    loading,
-    error,
-    selectedPath,
-    openedFilePath,
-    theme,
-    viewerExpanded,
-    setRepository,
-    setLoading,
-    setError,
-    toggleTheme,
-    setSelectedPath,
-    openFile,
-  } = useDashboardStore();
+  const { repository, loading, error, selectedPath, openedFilePath, theme, setRepository, setLoading, setError, toggleTheme, setSelectedPath, openFile } = useDashboardStore();
 
   useEffect(() => {
     const initial = parseDeepLinkState(window.location.search);
-    if (initial.path) {
-      setSelectedPath(initial.path);
-      openFile(initial.file ?? null);
-    } else if (initial.file) {
-      setSelectedPath(initial.file);
-      openFile(initial.file);
-    }
+    if (initial.path) setSelectedPath(initial.path);
+    if (initial.file) openFile(initial.file);
   }, [openFile, setSelectedPath]);
 
-  useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-  }, [theme]);
+  useEffect(() => { document.documentElement.setAttribute("data-theme", theme); }, [theme]);
 
   useEffect(() => {
     let cancelled = false;
-
     const loadRepository = async () => {
-      setLoading(true);
-      setError(null);
-
+      setLoading(true); setError(null);
       try {
         const nextRepository = await fetchRepositoryIndex();
-        if (!cancelled) {
-          setRepository(nextRepository);
-        }
+        if (!cancelled) setRepository(nextRepository);
       } catch (loadError) {
-        if (!cancelled) {
-          const errorMessage =
-            loadError instanceof Error
-              ? loadError.message
-              : "Falha ao carregar os arquivos do GitHub.";
-          setError(errorMessage);
-        }
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
-      }
+        if (!cancelled) setError(loadError instanceof Error ? loadError.message : "Não foi possível carregar o acervo.");
+      } finally { if (!cancelled) setLoading(false); }
     };
-
     loadRepository();
-
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [setError, setLoading, setRepository]);
 
-  useEffect(() => {
-    writeDeepLinkState({
-      path: selectedPath,
-      file: openedFilePath,
-      mode: "hierarchy",
-    });
-  }, [openedFilePath, selectedPath]);
+  useEffect(() => { writeDeepLinkState({ path: selectedPath, file: openedFilePath, mode: "hierarchy" }); }, [openedFilePath, selectedPath]);
 
-  const openedNode =
-    openedFilePath && repository
-      ? (repository.nodesByPath[openedFilePath] ?? null)
-      : null;
+  const openedNode = openedFilePath && repository ? (repository.nodesByPath[openedFilePath] ?? null) : null;
 
   return (
-    <div className="dashboard-shell">
-      <header className="topbar">
-        <div>
-          <p className="eyebrow">Repositorio academico visual</p>
-          <h1>UABJ Engenharia Dashboard</h1>
-        </div>
-        <div
-          className="theme-toggle"
-          role="group"
-          aria-label="Tema da interface"
-        >
-          <button
-            className={theme === "light" ? "active" : ""}
-            onClick={toggleTheme}
-          >
-            {theme === "light" ? "Ativar modo escuro" : "Ativar modo claro"}
-          </button>
+    <div className="app-shell">
+      <header className="site-header">
+        <a className="brand" href={import.meta.env.BASE_URL} aria-label="Voltar ao início">
+          <span className="brand-mark" aria-hidden="true">UA</span>
+          <span><strong>Acervo UABJ</strong><small>Engenharia da Computação</small></span>
+        </a>
+        <SearchPanels />
+        <div className="header-actions">
+          <a href="https://github.com/LipeLacross/uabj-engenharia-computacao" target="_blank" rel="noreferrer">Contribuir</a>
+          <button className="theme-button" onClick={toggleTheme} aria-label={`Ativar tema ${theme === "light" ? "escuro" : "claro"}`}>{theme === "light" ? "☾" : "☀"}</button>
         </div>
       </header>
 
-      <main
-        className={`dashboard-grid ${viewerExpanded ? "viewer-expanded" : ""}`}
-      >
-        <aside className="sidebar">
-          <SearchPanels />
-          <RepositoryBrowser />
-        </aside>
-
-        <section className="graph-area">
-          {loading && (
-            <p className="state-pill">Carregando estrutura do repositorio...</p>
-          )}
-          {error && <p className="state-pill error">{error}</p>}
-          {!loading && !error && repository && <RepositoryGraph />}
-        </section>
-
-        <section className="viewer-area">
-          <FileViewer node={openedNode} />
-        </section>
+      <main className="main-content">
+        {loading && <section className="loading-state"><div className="loader" /><h1>Organizando o acervo...</h1><p>Estamos preparando os materiais para você.</p></section>}
+        {error && <section className="error-state"><span>⚠</span><h1>Não foi possível abrir o acervo</h1><p>{error}</p><button onClick={() => window.location.reload()}>Tentar novamente</button></section>}
+        {!loading && !error && repository && (
+          <>
+            {!selectedPath && <section className="welcome"><div><p className="eyebrow">Materiais feitos por alunos, para alunos</p><h1>Encontre o que precisa para continuar aprendendo.</h1><p>Navegue por períodos e disciplinas ou pesquise diretamente por uma prova, lista ou assunto.</p></div><div className="collection-stats"><span><strong>{repository.dirPaths.length}</strong> seções</span><span><strong>{repository.filePaths.length}</strong> materiais</span></div></section>}
+            <RepositoryBrowser />
+          </>
+        )}
       </main>
+
+      {openedNode && <aside className="viewer-drawer" aria-label="Visualizador de material"><FileViewer node={openedNode} /></aside>}
+      <footer><span>Acervo comunitário da UABJ</span><a href="https://github.com/LipeLacross/uabj-engenharia-computacao" target="_blank" rel="noreferrer">Acessar repositório ↗</a></footer>
     </div>
   );
 }

@@ -14,15 +14,22 @@ const METADATA_EXACT = new Set([
   "contributing.md",
   ".gitignore",
   ".gitattributes",
+  ".gitkeep",
 ]);
 
 const METADATA_PREFIXES = [".github", ".git", "docs"];
 
 const tokenize = (value: string): string[] =>
-  value.toLowerCase().trim().split(/\s+/).filter(Boolean);
+  normalizeText(value).trim().split(/\s+/).filter(Boolean);
+
+const normalizeText = (value: string): string =>
+  value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
 
 const scorePath = (path: string, terms: string[]): number => {
-  const lowerPath = path.toLowerCase();
+  const lowerPath = normalizeText(path.replace(/[-_]/g, " "));
   let score = 0;
   for (const term of terms) {
     if (lowerPath === term) {
@@ -84,6 +91,18 @@ export const isContentNode = (node: RepoNode): boolean => {
   }
 
   return true;
+};
+
+export const formatRepositoryLabel = (value: string): string => {
+  const label = value
+    .replace(/\.[^.]+$/, "")
+    .replace(/[-_]+/g, " ")
+    .replace(/(^|\s)(\p{L})/gu, (_, space: string, letter: string) =>
+      `${space}${letter.toUpperCase()}`,
+    )
+    .replace(/^0?(\d+) Periodo$/i, "$1º período");
+
+  return label || "Acervo";
 };
 
 export const searchRepository = (

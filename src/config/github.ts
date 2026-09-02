@@ -1,6 +1,5 @@
 export const GITHUB_OWNER =
-  import.meta.env.VITE_GITHUB_OWNER ?? "FelipePatriota";
+  import.meta.env.VITE_GITHUB_OWNER ?? "LipeLacross";
 export const GITHUB_REPO =
   import.meta.env.VITE_GITHUB_REPO ?? "uabj-engenharia-computacao";
 export const GITHUB_BRANCH = import.meta.env.VITE_GITHUB_BRANCH ?? "main";
-export const GITHUB_TOKEN = import.meta.env.VITE_GITHUB_TOKEN ?? "";

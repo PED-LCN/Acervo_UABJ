@@ -1,18 +1,8 @@
 import { create } from "zustand";
 import type {
   RepositoryIndex,
-  SearchFilters,
   ThemeMode,
 } from "../types/repository";
-import { createDefaultSearchFilters } from "../services/indexer";
-
-export interface SearchPanelState {
-  id: string;
-  title: string;
-  query: string;
-  scopePath: string | null;
-  filters: SearchFilters;
-}
 
 interface DashboardState {
   repository: RepositoryIndex | null;
@@ -22,7 +12,7 @@ interface DashboardState {
   openedFilePath: string | null;
   theme: ThemeMode;
   viewerExpanded: boolean;
-  searchPanels: SearchPanelState[];
+  query: string;
   setRepository: (repository: RepositoryIndex) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
@@ -31,15 +21,9 @@ interface DashboardState {
   setTheme: (theme: ThemeMode) => void;
   toggleTheme: () => void;
   setViewerExpanded: (expanded: boolean) => void;
-  addSearchPanel: () => void;
-  removeSearchPanel: (id: string) => void;
-  updateSearchPanel: (
-    id: string,
-    patch: Partial<Omit<SearchPanelState, "id">>,
-  ) => void;
+  setQuery: (query: string) => void;
 }
 
-let panelCounter = 2;
 const THEME_KEY = "panel_ua_theme";
 
 const getInitialTheme = (): ThemeMode => {
@@ -52,14 +36,6 @@ const getInitialTheme = (): ThemeMode => {
     : "light";
 };
 
-const createPanel = (title: string): SearchPanelState => ({
-  id: crypto.randomUUID(),
-  title,
-  query: "",
-  scopePath: null,
-  filters: createDefaultSearchFilters(),
-});
-
 export const useDashboardStore = create<DashboardState>((set) => ({
   repository: null,
   loading: false,
@@ -68,7 +44,7 @@ export const useDashboardStore = create<DashboardState>((set) => ({
   openedFilePath: null,
   theme: getInitialTheme(),
   viewerExpanded: false,
-  searchPanels: [createPanel("Busca A"), createPanel("Busca B")],
+  query: "",
   setRepository: (repository) => set(() => ({ repository })),
   setLoading: (loading) => set(() => ({ loading })),
   setError: (error) => set(() => ({ error })),
@@ -89,29 +65,5 @@ export const useDashboardStore = create<DashboardState>((set) => ({
       return { theme: nextTheme };
     }),
   setViewerExpanded: (viewerExpanded) => set(() => ({ viewerExpanded })),
-  addSearchPanel: () =>
-    set((state) => {
-      panelCounter += 1;
-      return {
-        searchPanels: [
-          ...state.searchPanels,
-          createPanel(`Busca ${panelCounter}`),
-        ],
-      };
-    }),
-  removeSearchPanel: (id) =>
-    set((state) => {
-      if (state.searchPanels.length <= 1) {
-        return state;
-      }
-      return {
-        searchPanels: state.searchPanels.filter((panel) => panel.id !== id),
-      };
-    }),
-  updateSearchPanel: (id, patch) =>
-    set((state) => ({
-      searchPanels: state.searchPanels.map((panel) =>
-        panel.id === id ? { ...panel, ...patch } : panel,
-      ),
-    })),
+  setQuery: (query) => set(() => ({ query })),
 }));
