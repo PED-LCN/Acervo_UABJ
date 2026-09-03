@@ -4,7 +4,13 @@ export interface TransportStop {
   time: string;
   name: string;
   detail?: string;
-  coordinates?: { latitude: number; longitude: number };
+}
+
+export interface TransportPlace {
+  latitude: number;
+  longitude: number;
+  accuracy: "confirmed" | "estimated";
+  note?: string;
 }
 
 export interface TransportRoute {

@@ -1,10 +1,9 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { ContributionGuide } from "./components/contribute/ContributionGuide";
 import { CommunityFooter } from "./components/footer/CommunityFooter";
 import { SchedulePlanner } from "./components/planner/SchedulePlanner";
 import { ProfessorsDirectory } from "./components/professors/ProfessorsDirectory";
 import { SearchPanels } from "./components/sidebar/SearchPanels";
-import { TransportGuide } from "./components/transport/TransportGuide";
 import { RepositoryBrowser } from "./components/tree/RepositoryBrowser";
 import { FileViewer } from "./components/viewer/FileViewer";
 import { fetchRepositoryIndex } from "./services/githubClient";
@@ -12,10 +11,12 @@ import { useDashboardStore } from "./state/useDashboardStore";
 import { parseDeepLinkState, writeDeepLinkState } from "./utils/deepLink";
 import "./App.css";
 
+const TransportGuide = lazy(() => import("./components/transport/TransportGuide").then(module => ({ default: module.TransportGuide })));
+
 function App() {
   const [contributionOpen, setContributionOpen] = useState(false);
   const [professorsOpen, setProfessorsOpen] = useState(false);
-  const [activeView, setActiveView] = useState<"library" | "planner" | "transport">("library");
+  const [activeView, setActiveView] = useState<"library" | "planner">("library");
   const { repository, loading, error, selectedPath, openedFilePath, theme, setRepository, setLoading, setError, toggleTheme, setSelectedPath, openFile } = useDashboardStore();
 
   useEffect(() => {
@@ -44,6 +45,11 @@ function App() {
   useEffect(() => { writeDeepLinkState({ path: selectedPath, file: openedFilePath, mode: "hierarchy" }); }, [openedFilePath, selectedPath]);
 
   const openedNode = openedFilePath && repository ? (repository.nodesByPath[openedFilePath] ?? null) : null;
+  const showTransport = () => {
+    setSelectedPath(null);
+    openFile(null);
+    window.setTimeout(() => document.getElementById("transport")?.scrollIntoView({ behavior: "smooth" }), 0);
+  };
 
   return (
     <div className="app-shell">
@@ -58,10 +64,10 @@ function App() {
           </span>
           <span><strong>Acervo UABJ</strong><small>Engenharia da Computação</small></span>
         </a>
-        {activeView === "library" ? <div className="header-library-tools"><button className="professors-button" onClick={() => setProfessorsOpen(true)}><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3" /><path d="M6 19c.7-3.4 2.7-5 6-5s5.3 1.6 6 5" /></svg>Professores</button><SearchPanels /></div> : <nav className="section-switcher" aria-label="Áreas do site"><button onClick={() => setActiveView("library")}>Acervo</button><button className={activeView === "planner" ? "active" : ""} aria-current={activeView === "planner" ? "page" : undefined} onClick={() => setActiveView("planner")}>Planejador</button><button className={activeView === "transport" ? "active" : ""} aria-current={activeView === "transport" ? "page" : undefined} onClick={() => setActiveView("transport")}>Transporte</button></nav>}
+        {activeView === "library" ? <div className="header-library-tools"><button className="professors-button" onClick={() => setProfessorsOpen(true)}><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3" /><path d="M6 19c.7-3.4 2.7-5 6-5s5.3 1.6 6 5" /></svg>Professores</button><SearchPanels /></div> : <nav className="section-switcher" aria-label="Áreas do site"><button onClick={() => setActiveView("library")}>Acervo</button><button className="active" aria-current="page">Planejador</button></nav>}
         <div className="header-actions">
           {activeView === "library" && <button className="planner-button" onClick={() => setActiveView("planner")}>Montar grade</button>}
-          {activeView === "library" && <button className="transport-button" onClick={() => setActiveView("transport")}>Transporte</button>}
+          {activeView === "library" && <button className="transport-button" onClick={showTransport}>Transporte</button>}
           <button className="contribute-button" onClick={() => setContributionOpen(true)}>Como contribuir</button>
           <button className="theme-button" onClick={toggleTheme} aria-label={`Ativar tema ${theme === "light" ? "escuro" : "claro"}`}>{theme === "light" ? "☾" : "☀"}</button>
         </div>
@@ -69,7 +75,6 @@ function App() {
 
       <main className={`main-content ${activeView === "planner" ? "planner-main" : ""}`}>
         {activeView === "planner" && <SchedulePlanner />}
-        {activeView === "transport" && <TransportGuide />}
         {activeView === "library" && <>
         {loading && <section className="loading-state"><div className="loader" /><h1>Organizando o acervo...</h1><p>Estamos preparando os materiais para você.</p></section>}
         {error && <section className="error-state"><span>⚠</span><h1>Não foi possível abrir o acervo</h1><p>{error}</p><button onClick={() => window.location.reload()}>Tentar novamente</button></section>}
@@ -87,6 +92,7 @@ function App() {
               </section>
             </>}
             <RepositoryBrowser />
+            {!selectedPath && <Suspense fallback={<section className="transport-loading"><div className="loader" /><span>Preparando o mapa de transporte…</span></section>}><TransportGuide /></Suspense>}
           </>
         )}
         </>}
