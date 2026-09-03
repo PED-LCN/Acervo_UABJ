@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ContributionGuide } from "./components/contribute/ContributionGuide";
 import { CommunityFooter } from "./components/footer/CommunityFooter";
 import { SchedulePlanner } from "./components/planner/SchedulePlanner";
+import { ProfessorsDirectory } from "./components/professors/ProfessorsDirectory";
 import { SearchPanels } from "./components/sidebar/SearchPanels";
 import { RepositoryBrowser } from "./components/tree/RepositoryBrowser";
 import { FileViewer } from "./components/viewer/FileViewer";
@@ -12,6 +13,7 @@ import "./App.css";
 
 function App() {
   const [contributionOpen, setContributionOpen] = useState(false);
+  const [professorsOpen, setProfessorsOpen] = useState(false);
   const [activeView, setActiveView] = useState<"library" | "planner">("library");
   const { repository, loading, error, selectedPath, openedFilePath, theme, setRepository, setLoading, setError, toggleTheme, setSelectedPath, openFile } = useDashboardStore();
 
@@ -55,7 +57,7 @@ function App() {
           </span>
           <span><strong>Acervo UABJ</strong><small>Engenharia da Computação</small></span>
         </a>
-        {activeView === "library" ? <SearchPanels /> : <nav className="section-switcher" aria-label="Áreas do site"><button onClick={() => setActiveView("library")}>Acervo</button><button className="active" aria-current="page">Planejador</button></nav>}
+        {activeView === "library" ? <div className="header-library-tools"><button className="professors-button" onClick={() => setProfessorsOpen(true)}><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3" /><path d="M6 19c.7-3.4 2.7-5 6-5s5.3 1.6 6 5" /></svg>Professores</button><SearchPanels /></div> : <nav className="section-switcher" aria-label="Áreas do site"><button onClick={() => setActiveView("library")}>Acervo</button><button className="active" aria-current="page">Planejador</button></nav>}
         <div className="header-actions">
           {activeView === "library" && <button className="planner-button" onClick={() => setActiveView("planner")}>Montar grade</button>}
           <button className="contribute-button" onClick={() => setContributionOpen(true)}>Como contribuir</button>
@@ -89,6 +91,7 @@ function App() {
 
       {activeView === "library" && openedNode && <aside className="viewer-drawer" aria-label="Visualizador de material"><FileViewer node={openedNode} /></aside>}
       {contributionOpen && <ContributionGuide onClose={() => setContributionOpen(false)} />}
+      {professorsOpen && <ProfessorsDirectory onClose={() => setProfessorsOpen(false)} />}
       <CommunityFooter onContribute={() => setContributionOpen(true)} />
     </div>
   );
