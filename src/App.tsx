@@ -17,6 +17,7 @@ function App() {
   const [contributionOpen, setContributionOpen] = useState(false);
   const [professorsOpen, setProfessorsOpen] = useState(false);
   const [activeView, setActiveView] = useState<"library" | "planner">("library");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { repository, loading, error, selectedPath, openedFilePath, theme, setRepository, setLoading, setError, toggleTheme, setSelectedPath, openFile } = useDashboardStore();
 
   useEffect(() => {
@@ -26,6 +27,14 @@ function App() {
   }, [openFile, setSelectedPath]);
 
   useEffect(() => { document.documentElement.setAttribute("data-theme", theme); }, [theme]);
+
+  useEffect(() => {
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMobileMenuOpen(false);
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -46,9 +55,21 @@ function App() {
 
   const openedNode = openedFilePath && repository ? (repository.nodesByPath[openedFilePath] ?? null) : null;
   const showTransport = () => {
+    setActiveView("library");
     setSelectedPath(null);
     openFile(null);
+    setMobileMenuOpen(false);
     window.setTimeout(() => document.getElementById("transport")?.scrollIntoView({ behavior: "smooth" }), 0);
+  };
+
+  const showLibrary = () => {
+    setActiveView("library");
+    setMobileMenuOpen(false);
+  };
+
+  const showPlanner = () => {
+    setActiveView("planner");
+    setMobileMenuOpen(false);
   };
 
   return (
@@ -62,14 +83,37 @@ function App() {
               <path d="M11 4v4m5-4v4m5-4v4M11 24v4m5-4v4m5-4v4M4 11h4m-4 5h4m-4 5h4m16-10h4m-4 5h4m-4 5h4" />
             </svg>
           </span>
-          <span><strong>Acervo UABJ</strong><small>Engenharia da Computação</small></span>
+          <span className="brand-copy"><strong>Acervo UABJ</strong><small>Engenharia da Computação</small></span>
+          <span className="brand-mobile-label">Home</span>
         </a>
         {activeView === "library" ? <div className="header-library-tools"><button className="professors-button" onClick={() => setProfessorsOpen(true)}><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3" /><path d="M6 19c.7-3.4 2.7-5 6-5s5.3 1.6 6 5" /></svg>Professores</button><SearchPanels /></div> : <nav className="section-switcher" aria-label="Áreas do site"><button onClick={() => setActiveView("library")}>Acervo</button><button className="active" aria-current="page">Planejador</button></nav>}
+        <div className="mobile-search"><SearchPanels /></div>
         <div className="header-actions">
-          {activeView === "library" && <button className="planner-button" onClick={() => setActiveView("planner")}>Montar grade</button>}
+          {activeView === "library" && <button className="planner-button" onClick={showPlanner}>Montar grade</button>}
           {activeView === "library" && <button className="transport-button" onClick={showTransport}>Transporte</button>}
           <button className="contribute-button" onClick={() => setContributionOpen(true)}>Como contribuir</button>
           <button className="theme-button" onClick={toggleTheme} aria-label={`Ativar tema ${theme === "light" ? "escuro" : "claro"}`}>{theme === "light" ? "☾" : "☀"}</button>
+        </div>
+        <div className="mobile-navigation">
+          <button
+            className="mobile-menu-toggle"
+            onClick={() => setMobileMenuOpen((open) => !open)}
+            aria-expanded={mobileMenuOpen}
+            aria-controls="mobile-site-menu"
+            aria-label={mobileMenuOpen ? "Fechar menu" : "Abrir menu"}
+          >
+            <span /><span /><span />
+          </button>
+          {mobileMenuOpen && (
+            <nav className="mobile-menu" id="mobile-site-menu" aria-label="Menu do site">
+              <button onClick={showLibrary}>Acervo</button>
+              <button onClick={showPlanner}>Montar grade</button>
+              <button onClick={showTransport}>Transporte</button>
+              <button onClick={() => { setProfessorsOpen(true); setMobileMenuOpen(false); }}>Professores</button>
+              <button onClick={() => { setContributionOpen(true); setMobileMenuOpen(false); }}>Como contribuir</button>
+              <button onClick={() => { toggleTheme(); setMobileMenuOpen(false); }}>Usar tema {theme === "light" ? "escuro" : "claro"}</button>
+            </nav>
+          )}
         </div>
       </header>
 
