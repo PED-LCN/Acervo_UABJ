@@ -24,7 +24,7 @@ export const transportPlaces: Record<string, TransportPlace> = {
   "EREM João Monteiro": { latitude: -8.3390625, longitude: -36.4325625, accuracy: "confirmed" },
   "Posto Petrovia": { latitude: -8.3373125, longitude: -36.4303125, accuracy: "confirmed" },
   "Centro": { latitude: -8.3373125, longitude: -36.4259375, accuracy: "confirmed", note: "Referência em frente ao Bradesco." },
-  "Colegial": { latitude: -8.3336875, longitude: -36.4184375, accuracy: "estimated", note: "Referência provisória na Panificadora Nova Colegial." },
+  "Colegial": { latitude: -8.333728383906536, longitude: -36.41839721248319, accuracy: "confirmed" },
 };
 
 export const estimatedTransportPlaces = Object.entries(transportPlaces)
