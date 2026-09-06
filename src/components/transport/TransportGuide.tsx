@@ -99,7 +99,7 @@ export function TransportGuide() {
 
     <section className="transport-extras">
       <article><p className="eyebrow">Conexões diretas</p><h2>Expresso UABJ ↔ AEB</h2><div className="express-list">{expressConnections.map(connection => <div key={connection.period}><strong>{connection.period}</strong><span>{connection.departures.join(" · ")}</span><p>{connection.description}. {connection.note}</p></div>)}</div></article>
-      <article><p className="eyebrow">Regras de operação</p><h2>Embarque com tranquilidade</h2><ul><li>Esteja no local alguns minutos antes.</li><li>As rotas funcionam em dias úteis, de segunda a quinta-feira.</li><li>Às sextas, a frota atende a outras atividades institucionais.</li><li>Observe a sinalização do veículo antes do embarque.</li></ul></article>
+      <article><p className="eyebrow">Regras de operação</p><h2>Embarque com tranquilidade</h2><ul><li>Esteja no local alguns minutos antes.</li><li>As rotas funcionam em dias úteis, de segunda a sexta-feira.</li><li>Observe a sinalização do veículo antes do embarque.</li></ul></article>
       <article className="transport-contact"><p className="eyebrow">Dúvidas e atualizações</p><h2>Fale com o transporte</h2><p>Encontrou alguma divergência ou precisa confirmar uma viagem?</p><a href="mailto:transporte.uabj@ufrpe.br">transporte.uabj@ufrpe.br</a></article>
     </section>
     <p className="transport-source">Informações transcritas do Guia de Mobilidade UABJ, edição de agosto de 2026. Consulte os canais institucionais para confirmar alterações.</p>
